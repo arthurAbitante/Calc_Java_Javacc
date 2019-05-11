@@ -1,0 +1,64 @@
+options{  static = false;
+  LOOKAHEAD = 2;}PARSER_BEGIN(Calc)
+public class Calc{  public static void main(String args []) throws ParseException  {    Calc parser = new Calc(System.in);
+        while (true)    {     	parser.Start();	     }  }}PARSER_END(Calc)SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+}
+TOKEN:
+{
+    < NUMBER: (<DIGIT>)+ ( "." (<DIGIT>)+ )? >
+|   < DIGIT: ["0"-"9"] >
+|   < EOL: "\n" >
+}
+
+double expr():
+{
+    double a;
+    double b;
+}
+{
+    a=term()
+    (
+        "+" b=expr()    { a += b; }
+    |   "-" b=expr()    { a -= b; }
+    )*
+                        { return a; }
+}
+double term():
+{
+    double a;
+    double b;
+}
+{
+    a=unary()
+    (
+        "*" b=term()    { a *= b; }
+    |   "/" b=term()    { a /= b; }    | 	"^" b=term() 	{ a = Math.pow(a,b);}
+    )*
+                        { return a; }
+}
+double unary():
+{
+    double a;
+}
+{
+    "-" a=element()     { return -a; }
+|   a=element()         { return a; }
+}
+double element():
+{
+    Token t;
+    double a;
+}
+{
+    t=<NUMBER>          { return Double.parseDouble(t.toString()); }
+|   "(" a=expr() ")"    { return a; }
+}
+
+double Start() :{	double a;	}
+{
+	a = expr() { return a;}	
+}
